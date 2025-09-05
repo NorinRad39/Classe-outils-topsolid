@@ -2,7 +2,7 @@
 using Wpf = System.Windows;
 using WinForms = System.Windows.Forms;
 
-namespace Classe_outils_topsolid
+namespace OutilsTs
 {
     public static class UiHelper
     {

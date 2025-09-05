@@ -7,7 +7,7 @@ using TSHD = TopSolid.Cad.Design.Automating.TopSolidDesignHost;
 using TSCH = TopSolid.Cam.NC.Kernel.Automating.TopSolidCamHost;
 using Wpf = System.Windows;
 
-namespace TSCamPgmRename_WPF
+namespace OutilsTs
 {
     public class StartConnect
     {
