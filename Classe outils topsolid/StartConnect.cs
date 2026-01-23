@@ -7,10 +7,54 @@ using TSHD = TopSolid.Cad.Design.Automating.TopSolidDesignHost;
 using TSCH = TopSolid.Cam.NC.Kernel.Automating.TopSolidCamHost;
 using Wpf = System.Windows;
 
+/*
+================================================================================
+Liste des méthodes disponibles dans la classe StartConnect (OutilsTs)
+================================================================================
+
+Méthodes publiques :
+- void ConnectionTopsolid()
+    // Connecte aux hôtes TopSolid Kernel, Design et CAM.
+    // Syntaxe :
+    // var connector = new StartConnect();
+    // connector.ConnectionTopsolid();
+
+Méthodes privées :
+- void ConnectToTopSolid()
+    // Connecte à TopSolid Kernel.
+- void ConnectToTopSolidDesignHost()
+    // Connecte à TopSolid Design.
+- void ConnectToTopSolidCamHost()
+    // Connecte à TopSolid CAM.
+
+================================================================================
+Pour toute nouvelle méthode, ajoutez-la à cette liste pour faciliter la découverte.
+================================================================================
+*/
+
 namespace OutilsTs
 {
+    /// <summary>
+    /// Classe utilitaire pour gérer la connexion aux différents hôtes TopSolid (Kernel, Design, CAM).
+    /// </summary>
     public class StartConnect
     {
+        #region Méthodes privées
+
+        /// <summary>
+        /// Connecte à TopSolid Kernel.
+        /// Affiche un message en cas d'échec ou si déjà connecté.
+        /// </summary>
+        /// <remarks>
+        /// Namespace: OutilsTs
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // Appel interne depuis ConnectionTopsolid()
+        /// ConnectToTopSolid();
+        /// </code>
+        /// </example>
         private void ConnectToTopSolid()
         {
             try
@@ -33,6 +77,20 @@ namespace OutilsTs
             }
         }
 
+        /// <summary>
+        /// Connecte à TopSolid Design.
+        /// Affiche un message en cas d'échec ou si déjà connecté.
+        /// </summary>
+        /// <remarks>
+        /// Namespace: OutilsTs
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // Appel interne depuis ConnectionTopsolid()
+        /// ConnectToTopSolidDesignHost();
+        /// </code>
+        /// </example>
         private void ConnectToTopSolidDesignHost()
         {
             try
@@ -55,6 +113,20 @@ namespace OutilsTs
             }
         }
 
+        /// <summary>
+        /// Connecte à TopSolid CAM.
+        /// Affiche un message en cas d'échec ou si déjà connecté.
+        /// </summary>
+        /// <remarks>
+        /// Namespace: OutilsTs
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // Appel interne depuis ConnectionTopsolid()
+        /// ConnectToTopSolidCamHost();
+        /// </code>
+        /// </example>
         private void ConnectToTopSolidCamHost()
         {
             try
@@ -77,11 +149,30 @@ namespace OutilsTs
             }
         }
 
+        #endregion
+
+        #region Méthodes publiques
+
+        /// <summary>
+        /// Connecte aux hôtes TopSolid Kernel, Design et CAM.
+        /// </summary>
+        /// <remarks>
+        /// Namespace: OutilsTs
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// var connector = new StartConnect();
+        /// connector.ConnectionTopsolid();
+        /// </code>
+        /// </example>
         public void ConnectionTopsolid()
         {
             ConnectToTopSolid();
             ConnectToTopSolidDesignHost();
             ConnectToTopSolidCamHost();
         }
+
+        #endregion
     }
 }
