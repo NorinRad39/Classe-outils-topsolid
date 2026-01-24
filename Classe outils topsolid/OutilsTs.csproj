@@ -6,19 +6,21 @@
     <AssemblyName>OutilsTs</AssemblyName>
     <LangVersion>8.0</LangVersion>
     <PackageId>OutilsTs</PackageId>
-    <Version>1.0.2</Version>
-    <Authors>NorinRad</Authors>
-    <Company>File4All</Company>
-    <Description>Methode pour gerer les données des documents dans topsolid</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.3</Version> <!-- Incrémenter ici : 1.0.0 → 1.0.1 → 1.1.0 etc. -->
+    <Authors>NorinRad39</Authors>
+    <Company>Votre Société</Company>
+    <Description>Classe utilitaire pour TopSolid Automating - Export, connexion et outils</Description>
+    <PackageProjectUrl>https://github.com/NorinRad39/Classe-outils-topsolid</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NorinRad39/Classe-outils-topsolid</RepositoryUrl>
+    <PackageTags>topsolid;automating;export;cad</PackageTags>
+    <PackageReleaseNotes>Ajout de la classe Export avec support multi-formats</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Platforms>x64</Platforms>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <OutputType>Library</OutputType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <PackageReleaseNotes>Ajout de commentaires d'aide au format xml</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

@@ -131,10 +131,19 @@ namespace OutilsTs
         {
             try
             {
+                // Récupère l'identifiant du document actuellement édité dans TopSolid
+                // Note : On assigne directement le champ privé docId (pas la propriété DocId)
+                // car le setter de DocId va être appelé manuellement ensuite pour initialiser tous les champs
                 docId = TSH.Documents.EditedDocument;
+                
+                // Initialise automatiquement toutes les propriétés du document
+                // en réutilisant le setter de la propriété DocId
+                DocId = docId;
             }
             catch (Exception ex)
             {
+                // En cas d'erreur, on log simplement dans la console
+                // Le document reste avec des valeurs par défaut (docId = Empty)
                 Console.WriteLine($"Erreur lors de la récupération du document courant : {ex.Message}");
             }
         }
@@ -155,7 +164,18 @@ namespace OutilsTs
         /// </example>
         public Document(DocumentId docId)
         {
-            DocId = docId;  // ← Ceci assigne à une propriété DocId
+            // Important : On utilise la propriété DocId (avec majuscule) et non le champ docId
+            // Cela déclenche le setter qui initialise automatiquement tous les champs de la classe :
+            // - docNomTxt (nom du document)
+            // - docPdmObject (objet PDM)
+            // - docExtention (extension/type)
+            // - docParameters (liste des paramètres)
+            // - docOperations (liste des opérations)
+            // - docCommentaireSysId (paramètre commentaire système)
+            // - docDescriptionSysId (paramètre description système)
+            // - docDerived (si le document est dérivé)
+            // - docIsElectrode (si le document est une électrode)
+            DocId = docId;
         }
         #endregion
 
@@ -179,8 +199,138 @@ namespace OutilsTs
         /// </returns>
         public DocumentId DocId 
         { 
+            // Retourne simplement le champ privé docId
             get => docId; 
-            set => docId = value; 
+            set 
+            {
+                // Assigne l'identifiant du document
+                docId = value;
+                
+                // Vérifie si l'identifiant est valide (non vide)
+                // Si invalide, on arrête l'initialisation
+                if (!IsValidDocument(docId)) return;
+                
+                // --- Initialisation du nom du document ---
+                try
+                {
+                    // Récupère le nom du document depuis l'API TopSolid
+                    // Utilise "Nom inconnu" comme valeur par défaut si null
+                    docNomTxt = TSH.Documents.GetName(docId) ?? "Nom inconnu";
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, on affiche le message et on assigne "Erreur"
+                    Console.WriteLine($"Erreur lors de la récupération du nom du document : {ex.Message}");
+                    docNomTxt = "Erreur";
+                }
+                
+                // --- Initialisation de l'objet PDM ---
+                try
+                {
+                    // Récupère l'objet PDM (Product Data Management) du document
+                    docPdmObject = TSH.Documents.GetPdmObject(docId);
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, on utilise un PdmObjectId vide
+                    Console.WriteLine($"Erreur lors de la récupération de l'objet PDM : {ex.Message}");
+                    docPdmObject = PdmObjectId.Empty;
+                }
+                
+                // --- Initialisation de la liste des paramètres ---
+                try
+                {
+                    // Récupère tous les paramètres du document
+                    // Si null, on initialise avec une liste vide
+                    docParameters = TSH.Parameters.GetParameters(docId) ?? new List<ElementId>();
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, on initialise avec une liste vide
+                    Console.WriteLine($"Erreur lors de la récupération des paramètres : {ex.Message}");
+                    docParameters = new List<ElementId>();
+                }
+                
+                // --- Initialisation de la liste des opérations ---
+                try
+                {
+                    // Récupère toutes les opérations du document
+                    // Si null, on initialise avec une liste vide
+                    docOperations = TSH.Operations.GetOperations(docId) ?? new List<ElementId>();
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, on initialise avec une liste vide
+                    Console.WriteLine($"Erreur lors de la récupération des opérations : {ex.Message}");
+                    docOperations = new List<ElementId>();
+                }
+                
+                // --- Initialisation du paramètre commentaire système ---
+                try
+                {
+                    // Récupère l'identifiant du paramètre "Commentaire" système
+                    docCommentaireSysId = TSH.Parameters.GetCommentParameter(docId);
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, on utilise un ElementId vide
+                    Console.WriteLine($"Erreur lors de la récupération du commentaire système : {ex.Message}");
+                    docCommentaireSysId = ElementId.Empty;
+                }
+                
+                // --- Initialisation du paramètre description système ---
+                try
+                {
+                    // Récupère l'identifiant du paramètre "Description" système
+                    docDescriptionSysId = TSH.Parameters.GetDescriptionParameter(docId);
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, on utilise un ElementId vide
+                    Console.WriteLine($"Erreur lors de la récupération de la description système : {ex.Message}");
+                    docDescriptionSysId = ElementId.Empty;
+                }
+                
+                // --- Vérification si le document est dérivé ---
+                try
+                {
+                    // Vérifie si le document est un document dérivé (instance d'un template)
+                    docDerived = TSHD.Tools.IsDerived(docId);
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, on considère qu'il n'est pas dérivé
+                    Console.WriteLine($"Erreur lors de la vérification du caractère dérivé du document : {ex.Message}");
+                    docDerived = false;
+                }
+                
+                // --- Vérification si le document est une électrode ---
+                try
+                {
+                    // Appelle la méthode privée pour déterminer si c'est une électrode
+                    docIsElectrode = IsElectrode(docId);
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, on considère que ce n'est pas une électrode
+                    Console.WriteLine($"Erreur lors de la vérification si le document est une électrode : {ex.Message}");
+                    docIsElectrode = false;
+                }
+                
+                // --- Récupération de l'extension du document ---
+                try
+                {
+                    // Récupère le type/extension du document depuis l'objet PDM
+                    // Utilise un paramètre de sortie (out) pour récupérer l'extension
+                    TSH.Pdm.GetType(docPdmObject, out docExtention);
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, l'extension reste null
+                    Console.WriteLine($"Erreur lors de la récupération de l'extension du document : {ex.Message}");
+                    docExtention = null;
+                }
+            }
         }
 
         /// <summary>
@@ -200,10 +350,16 @@ namespace OutilsTs
         /// Type: <see cref="string"/>
         /// Nom du document.
         /// </returns>
-        public string DocNomTxt { get => docNomTxt; private set => docNomTxt = value; }
+        public string DocNomTxt 
+        { 
+            // Retourne le nom du document (initialisé dans le setter de DocId)
+            get => docNomTxt; 
+            // Setter privé : seule cette classe peut modifier le nom
+            private set => docNomTxt = value; 
+        }
 
         /// <summary>
-        /// Obtient l’extension/type PDM du document.
+        /// Obtient l'extension/type PDM du document.
         /// </summary>
         /// <remarks>
         /// Namespace: OutilsTs  
@@ -219,10 +375,16 @@ namespace OutilsTs
         /// Type: <see cref="string"/>
         /// Extension ou type PDM du document.
         /// </returns>
-        public string DocExtention { get => docExtention; private set => docExtention = value; }
+        public string DocExtention 
+        { 
+            // Retourne l'extension/type du document (ex: "TopSolidPart", "TopSolidAssembly")
+            get => docExtention; 
+            // Setter privé : seule cette classe peut modifier l'extension
+            private set => docExtention = value; 
+        }
 
         /// <summary>
-        /// Obtient l’objet PDM associé au document.
+        /// Obtient l'objet PDM associé au document.
         /// </summary>
         /// <remarks>
         /// Namespace: OutilsTs  
@@ -240,10 +402,14 @@ namespace OutilsTs
         /// </returns>
         public PdmObjectId DocPdmObject
         {
+            // Retourne l'objet PDM du document
             get => docPdmObject;
             set
             {
+                // Assigne l'objet PDM
                 docPdmObject = value;
+                // Met à jour automatiquement l'extension du document
+                // en récupérant le type depuis l'objet PDM
                 TSH.Pdm.GetType(docPdmObject, out docExtention);
             }
         }
@@ -265,7 +431,13 @@ namespace OutilsTs
         /// Type: <see cref="List{ElementId}"/>
         /// Liste des paramètres du document.
         /// </returns>
-        public List<ElementId> DocParameters { get => docParameters; private set => docParameters = value; }
+        public List<ElementId> DocParameters 
+        { 
+            // Retourne la liste de tous les paramètres du document
+            get => docParameters; 
+            // Setter privé : seule cette classe peut modifier la liste
+            private set => docParameters = value; 
+        }
 
         /// <summary>
         /// Obtient la liste des opérations du document.
@@ -284,10 +456,16 @@ namespace OutilsTs
         /// Type: <see cref="List{ElementId}"/>
         /// Liste des opérations du document.
         /// </returns>
-        public List<ElementId> DocOperations { get => docOperations; private set => docOperations = value; }
+        public List<ElementId> DocOperations 
+        { 
+            // Retourne la liste de toutes les opérations du document
+            get => docOperations; 
+            // Setter privé : seule cette classe peut modifier la liste
+            private set => docOperations = value; 
+        }
 
         /// <summary>
-        /// Obtient l’identifiant du paramètre commentaire système.
+        /// Obtient l'identifiant du paramètre commentaire système.
         /// </summary>
         /// <remarks>
         /// Namespace: OutilsTs  
@@ -303,10 +481,16 @@ namespace OutilsTs
         /// Type: <see cref="ElementId"/>
         /// Identifiant du paramètre commentaire système.
         /// </returns>
-        public ElementId DocCommentaireSysId { get => docCommentaireSysId; private set => docCommentaireSysId = value; }
+        public ElementId DocCommentaireSysId 
+        { 
+            // Retourne l'ID du paramètre "Commentaire" système
+            get => docCommentaireSysId; 
+            // Setter privé : seule cette classe peut modifier cet ID
+            private set => docCommentaireSysId = value; 
+        }
 
         /// <summary>
-        /// Obtient l’identifiant du paramètre description système.
+        /// Obtient l'identifiant du paramètre description système.
         /// </summary>
         /// <remarks>
         /// Namespace: OutilsTs  
@@ -322,7 +506,13 @@ namespace OutilsTs
         /// Type: <see cref="ElementId"/>
         /// Identifiant du paramètre description système.
         /// </returns>
-        public ElementId DocDescriptionSysId { get => docDescriptionSysId; private set => docDescriptionSysId = value; }
+        public ElementId DocDescriptionSysId 
+        { 
+            // Retourne l'ID du paramètre "Description" système
+            get => docDescriptionSysId; 
+            // Setter privé : seule cette classe peut modifier cet ID
+            private set => docDescriptionSysId = value; 
+        }
 
         /// <summary>
         /// Indique si le document est dérivé.
@@ -341,7 +531,13 @@ namespace OutilsTs
         /// Type: <see cref="bool"/>
         /// <c>true</c> si le document est dérivé, sinon <c>false</c>.
         /// </returns>
-        public bool DocDerived { get => docDerived; private set => docDerived = value; }
+        public bool DocDerived 
+        { 
+            // Retourne true si le document est une instance dérivée d'un template
+            get => docDerived; 
+            // Setter privé : seule cette classe peut modifier cette valeur
+            private set => docDerived = value; 
+        }
 
         /// <summary>
         /// Indique si le document est une électrode.
@@ -360,7 +556,13 @@ namespace OutilsTs
         /// Type: <see cref="bool"/>
         /// <c>true</c> si le document est une électrode, sinon <c>false</c>.
         /// </returns>
-        public bool DocIsElectrode { get => docIsElectrode; private set => docIsElectrode = value; }
+        public bool DocIsElectrode 
+        { 
+            // Retourne true si le document est une électrode d'usinage
+            get => docIsElectrode; 
+            // Setter privé : seule cette classe peut modifier cette valeur
+            private set => docIsElectrode = value; 
+        }
 
         /// <summary>
         /// Obtient la liste des opérations CAM du document (si document CAM).
@@ -379,7 +581,11 @@ namespace OutilsTs
         /// Type: <see cref="List{ElementId}"/>
         /// Liste des opérations CAM.
         /// </returns>
-        public List<ElementId> CamOperations => GetCamOperations(DocId);
+        public List<ElementId> CamOperations => 
+            // Propriété en lecture seule (expression-bodied)
+            // Appelle la méthode privée pour récupérer les opérations CAM
+            // Retourne une liste vide si ce n'est pas un document CAM
+            GetCamOperations(DocId);
 
         /// <summary>
         /// Indique si le document est un document CAM.
@@ -398,10 +604,13 @@ namespace OutilsTs
         /// Type: <see cref="bool"/>
         /// <c>true</c> si le document est un document CAM, sinon <c>false</c>.
         /// </returns>
-        public bool DocuCam => IsDocuCam(DocId);
+        public bool DocuCam => 
+            // Propriété en lecture seule (expression-bodied)
+            // Appelle la méthode privée pour vérifier si c'est un document CAM
+            IsDocuCam(DocId);
 
         /// <summary>
-        /// Obtient le numéro d’OP du document (si présent).
+        /// Obtient le numéro d'OP du document (si présent).
         /// </summary>
         /// <remarks>
         /// Namespace: OutilsTs  
@@ -415,9 +624,13 @@ namespace OutilsTs
         /// </example>
         /// <returns>
         /// Type: <see cref="string"/>
-        /// Numéro d’OP du document.
+        /// Numéro d'OP du document.
         /// </returns>
-        public string OP => NumOP(DocId);
+        public string OP => 
+            // Propriété en lecture seule (expression-bodied)
+            // Appelle la méthode privée pour récupérer le numéro d'OP
+            // Retourne une chaîne vide si le paramètre OP n'existe pas
+            NumOP(DocId);
         #endregion
 
         #region Méthodes privées
