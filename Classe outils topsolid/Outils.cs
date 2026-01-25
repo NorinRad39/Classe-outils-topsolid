@@ -51,6 +51,11 @@ Propriétés principales :
     // Syntaxe :
     // var operations = doc.DocOperations;
 
+- List<ElementId> DocElements          // ✅ AJOUTER ICI
+    // Liste de tous les éléments du document.
+    // Syntaxe :
+    // var elements = doc.DocElements;
+
 - ElementId DocCommentaireSysId
     // Identifiant du paramètre commentaire système.
     // Syntaxe :
@@ -106,6 +111,7 @@ namespace OutilsTs
         private PdmObjectId docPdmObject;
         private List<ElementId> docParameters = new List<ElementId>();
         private List<ElementId> docOperations = new List<ElementId>();
+        private List<ElementId> docElements = new List<ElementId>();  
         private ElementId docCommentaireSysId;
         private ElementId docDescriptionSysId;
         private bool docDerived;
@@ -462,6 +468,29 @@ namespace OutilsTs
             get => docOperations; 
             // Setter privé : seule cette classe peut modifier la liste
             private set => docOperations = value; 
+        }
+
+        /// <summary>
+        /// Obtient la liste des éléments du document.
+        /// </summary>
+        /// <remarks>
+        /// Namespace: OutilsTs  
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// var doc = new Document();
+        /// var elements = doc.DocElements;
+        /// </code>
+        /// </example>
+        /// <returns>
+        /// Type: <see cref="List{ElementId}"/>
+        /// Liste des éléments du document.
+        /// </returns>
+        public List<ElementId> DocElements 
+        { 
+            get => docElements; 
+            private set => docElements = value; 
         }
 
         /// <summary>
@@ -1000,6 +1029,37 @@ namespace OutilsTs
             {
                 HandleException(ex, "Impossible de récupérer le numéro OP.");
                 return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Récupère tous les éléments du document.
+        /// </summary>
+        /// <param name="document">Identifiant du document.</param>
+        /// <remarks>
+        /// Namespace: OutilsTs  
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// var elements = GetElements(docId);
+        /// </code>
+        /// </example>
+        /// <returns>
+        /// Type: <see cref="List{ElementId}"/>
+        /// Liste de tous les éléments du document.
+        /// </returns>
+        private List<ElementId> GetElements(DocumentId document)
+        {
+            if (!IsValidDocument(document)) return new List<ElementId>();
+            try
+            {
+                return TSH.Elements.GetElements(document);
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex, "Impossible de récupérer les éléments du document.");
+                return new List<ElementId>();
             }
         }
         #endregion
