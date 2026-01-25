@@ -270,7 +270,21 @@ namespace OutilsTs
                     Console.WriteLine($"Erreur lors de la récupération des opérations : {ex.Message}");
                     docOperations = new List<ElementId>();
                 }
-                
+
+                // --- Initialisation de la liste des éléments ---
+                try
+                {
+                    // Récupère tous les éléments du document
+                    // Si null, on initialise avec une liste vide
+                    docElements = TSH.Elements.GetElements(docId) ?? new List<ElementId>();
+                }
+                catch (Exception ex)
+                {
+                    // En cas d'erreur, on initialise avec une liste vide
+                    Console.WriteLine($"Erreur lors de la récupération des éléments : {ex.Message}");
+                    docElements = new List<ElementId>();
+                }
+
                 // --- Initialisation du paramètre commentaire système ---
                 try
                 {
