@@ -6,7 +6,7 @@
     <AssemblyName>OutilsTs</AssemblyName>
     <LangVersion>8.0</LangVersion>
     <PackageId>OutilsTs</PackageId>
-    <Version>1.0.6</Version> <!-- Incrémenter ici : 1.0.0 → 1.0.1 → 1.1.0 etc. -->
+    <Version>1.0.7</Version> <!-- Incrémenter ici : 1.0.0 → 1.0.1 → 1.1.0 etc. -->
     <Authors>NorinRad39</Authors>
     <Company>Votre Société</Company>
     <Description>Classe utilitaire pour TopSolid Automating - Export, connexion et outils</Description>

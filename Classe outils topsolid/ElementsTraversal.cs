@@ -7,6 +7,29 @@ namespace OutilsTs
     /// <summary>
     /// Classe utilitaire pour la traversée récursive d'éléments TopSolid
     /// </summary>
+    /// <example>
+    /// Exemples d'utilisation :
+    /// 
+    /// // Pour GetConstituents (récupérer tous les constituants récursivement)
+    /// var constituents = ElementsTraversal.GetAllDescendants(
+    ///     paralleOperationsActive, 
+    ///     elem => TopSolidHost.Elements.GetConstituents(elem)
+    /// );
+    /// 
+    /// // Pour GetChildren (récupérer tous les enfants récursivement)
+    /// var children = ElementsTraversal.GetAllDescendants(
+    ///     operations,
+    ///     elem => TopSolidHost.Operations.GetChildren(elem),
+    ///     maxDepth: 3 // Limiter à 3 niveaux
+    /// );
+    /// 
+    /// // Avec filtrage (exemple : récupérer uniquement les solides)
+    /// var solids = ElementsTraversal.GetAllDescendantsFiltered(
+    ///     rootElement,
+    ///     elem => TopSolidHost.Elements.GetConstituents(elem),
+    ///     elem => TopSolidHost.Elements.GetTypeFullName(elem).Contains("Solid")
+    /// );
+    /// </example>
     public static class ElementsTraversal
     {
         /// <summary>
