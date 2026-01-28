@@ -158,7 +158,7 @@ namespace OutilsTs
             int? maxDepth = null)
         {
             var allDescendants = GetAllDescendants(rootElement, getChildrenFunc, maxDepth);
-            
+
             if (filterFunc == null)
             {
                 return allDescendants;
