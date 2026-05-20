@@ -181,9 +181,29 @@ namespace OutilsTs
         }
 
         /// <summary>
-        /// Constructeur privé.
+        /// Constructeur privé pour créer une instance de <see cref="ProjetPDM"/>.
         /// </summary>
-        /// <param name="pdmObjectId">L'identifiant PDM du projet.</param>
+        /// <param name="pdmObjectId">L'identifiant PDM du projet. Doit être un <see cref="PdmObjectId"/> valide (non vide).</param>
+        /// <remarks>
+        /// Cette instance initialise les champs internes nécessaires :
+        /// - stocke l'identifiant PDM dans <see cref="_pdmObjectId"/>.
+        /// - récupère et affecte le nom du projet via <c>TSH.Pdm.GetName(pdmObjectId)</c>.
+        ///
+        /// Le constructeur est privé afin de forcer la création d'instances via les
+        /// méthodes/factories exposées par la classe (par exemple <see cref="ProjetCourant"/> et <see cref="GetLibraries"/>).
+        /// </remarks>
+        /// <exception cref="ArgumentException">Si <paramref name="pdmObjectId"/> est vide (vérifier avec <c>pdmObjectId.IsEmpty</c> avant l'appel).</exception>
+        /// <exception cref="Exception">
+        /// Peut lever une exception si l'appel à l'API TopSolid (<c>TSH.Pdm.GetName</c>) échoue.
+        /// Gérez les exceptions appelantes si nécessaire.
+        /// </exception>
+        /// <example>
+        /// <code>
+        /// // Exemple d'usage indirect : obtenir le projet courant
+        /// var projet = ProjetPDM.ProjetCourant;
+        /// // -> n'appelez pas directement le constructeur depuis l'extérieur (il est privé)
+        /// </code>
+        /// </example>
         private ProjetPDM(PdmObjectId pdmObjectId)
         {
             _pdmObjectId = pdmObjectId;
@@ -291,7 +311,7 @@ namespace OutilsTs
         ///         
         ///         // Rafraîchir pour la prochaine itération
         ///         projet.Rafraichir();
-        ///         
+        ///             
         ///         System.Threading.Thread.Sleep(5000); // Attendre 5 secondes
         ///     }
         /// }
@@ -362,5 +382,201 @@ namespace OutilsTs
         /// </code>
         /// </example>
         public bool EstValide => !_pdmObjectId.IsEmpty;
+
+                /// <summary>
+        /// Récupère la liste des projets PDM considérés comme des bibliothèques.
+        /// </summary>
+        /// <returns>
+        /// Une <see cref="List{ProjetPDM}"/> contenant une instance <see cref="ProjetPDM"/> pour chaque projet bibliothèque trouvé.
+        /// Si aucun projet n'est trouvé ou si l'appel à l'API PDM retourne <c>null</c>, une liste vide est retournée.
+        /// </returns>
+        /// <remarks>
+        /// Cette méthode appelle <c>TSH.Pdm.GetProjects(false, true)</c> pour obtenir les projets de type bibliothèque.
+        /// Les entrées renvoyées par l'API PDM sont filtrées : seuls les <see cref="PdmObjectId"/> non vides sont transformés
+        /// en instances <see cref="ProjetPDM"/>.
+        /// La méthode ne lève pas d'exception si l'API retourne <c>null</c> ; elle renvoie simplement une liste vide.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // Obtenir toutes les bibliothèques et afficher leur nom
+        /// var biblios = ProjetPDM.GetLibraries();
+        /// foreach (var biblio in biblios)
+        /// {
+        ///     Console.WriteLine(biblio.Nom);
+        /// }
+        /// </code>
+        /// </example>
+        public static List<ProjetPDM> GetLibraries()
+        {
+            var result = new List<ProjetPDM>();
+            var allProject = TSH.Pdm.GetProjects(false, true);
+            if (allProject == null)
+                return result;
+
+            foreach (var project in allProject)
+            {
+                if (!project.IsEmpty)
+                    result.Add(new ProjetPDM(project));
+            }
+
+            return result;
+        }
+
+       
+
+        /// <summary>
+        /// Récupère les noms des bibliothèques PDM.
+        /// </summary>
+        /// <returns>
+        /// Une <see cref="List{String}"/> contenant les noms des projets bibliothèques.
+        /// Si aucun projet n'est trouvé ou si l'appel à l'API PDM retourne <c>null</c>, une liste vide est retournée.
+        /// </returns>
+        /// <remarks>
+        /// Cette méthode demande la liste des projets bibliothèques via <c>TSH.Pdm.GetProjects(false, true)</c>,
+        /// puis récupère le nom de chaque projet avec <c>TSH.Pdm.GetName</c>.
+        /// Les erreurs lors de la lecture du nom d'un projet sont ignorées (bloc <c>try/catch</c> vide),
+        /// ce qui permet de continuer la collecte des noms même si certains projets sont invalides ou inaccessibles.
+        /// Notez que des doublons sont possibles si plusieurs projets partagent le même nom.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // Obtenir et afficher les noms des bibliothèques
+        /// var noms = ProjetPDM.GetLibraryNames();
+        /// Console.WriteLine($"Bibliothèques trouvées : {noms.Count}");
+        /// foreach (var nom in noms)
+        /// {
+        ///     Console.WriteLine($"- {nom}");
+        /// }
+        /// </code>
+        /// </example>
+        public static List<string> GetLibraryNames()
+        {
+            var result = new List<string>();
+            var allProject = TSH.Pdm.GetProjects(false, true);
+            if (allProject == null)
+                return result;
+
+            foreach (var project in allProject)
+            {
+                try
+                {
+                    result.Add(TSH.Pdm.GetName(project));
+                }
+                catch
+                {
+                    // Ignore les projets invalides
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Accès en tant qu'objet à la collection des bibliothèques PDM.
+        /// </summary>
+        /// <remarks>
+        /// Equivalent à appeler <see cref="GetLibraries"/> ; retourne une collection en lecture seule.
+        /// Utile pour écrire du code plus expressif : <c>var libs = ProjetPDM.Libraries;</c>
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // Récupérer toutes les bibliothèques
+        /// var biblios = ProjetPDM.Libraries;
+        ///
+        /// // Récupérer la première bibliothèque
+        /// var premiere = biblios.FirstOrDefault();
+        ///
+        /// // Trouver une bibliothèque par nom
+        /// var myBiblio = ProjetPDM.GetLibraryByName("MaBibliotheque");
+        /// if (myBiblio != null)
+        /// {
+        ///     Console.WriteLine(myBiblio.Nom);
+        /// }
+        /// </code>
+        /// </example>
+        public static IReadOnlyList<ProjetPDM> Libraries => GetLibraries();
+
+        /// <summary>
+        /// Recherche une bibliothèque PDM par son nom.
+        /// </summary>
+        /// <param name="name">Nom exact de la bibliothèque recherchée.</param>
+        /// <param name="ignoreCase">Si <c>true</c>, la recherche ignore la casse (par défaut <c>true</c>).</param>
+        /// <returns>L'instance <see cref="ProjetPDM"/> correspondante si trouvée, sinon <c>null</c>.</returns>
+        /// <remarks>
+        /// Effectue une recherche en mémoire sur la liste retournée par <see cref="GetLibraries"/>.
+        /// </remarks>
+               /// <summary>
+        /// Recherche une bibliothèque PDM par son nom.
+        /// </summary>
+        /// <param name="name">Nom exact de la bibliothèque recherchée. La valeur <c>null</c> ou chaîne vide retourne <c>null</c>.</param>
+        /// <param name="ignoreCase">Si <c>true</c>, la comparaison ignore la casse (par défaut : <c>true</c>).</param>
+        /// <returns>
+        /// L'instance <see cref="ProjetPDM"/> correspondant au nom si trouvée ; sinon <c>null</c>.
+        /// </returns>
+        /// <remarks>
+        /// - La recherche est effectuée en mémoire sur la collection renvoyée par <see cref="GetLibraries"/>. 
+        /// - Cette méthode effectue un appel vers l'API PDM (via <see cref="GetLibraries"/>) à chaque invocation : pour des recherches répétées,
+        ///   préférez récupérer la collection via la propriété <see cref="Libraries"/> puis interroger cette collection localement afin d'éviter
+        ///   des appels réseau/IO supplémentaires.
+        /// - Si <paramref name="name"/> est <c>null</c> ou vide, la méthode retourne immédiatement <c>null</c>.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // Recherche insensible à la casse (par défaut)
+        /// var biblio = ProjetPDM.GetLibraryByName("MaBibliotheque");
+        /// if (biblio != null)
+        /// {
+        ///     Console.WriteLine($"Bibliothèque trouvée : {biblio.Nom}");
+        /// }
+        /// 
+        /// // Recherche sensible à la casse
+        /// var biblioExacte = ProjetPDM.GetLibraryByName("MaBibliotheque", ignoreCase: false);
+        /// </code>
+        /// </example>
+        public static ProjetPDM GetLibraryByName(string name, bool ignoreCase = true)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+
+            var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            return GetLibraries().FirstOrDefault(p => string.Equals(p.Nom, name, comparison));
+        }
+
+        /// <summary>
+        /// Tente de récupérer une bibliothèque PDM par son nom.
+        /// </summary>
+        /// <param name="name">Nom recherché de la bibliothèque. Doit être non null et non vide.</param>
+        /// <param name="projet">Sortie : l'instance <see cref="ProjetPDM"/> correspondant au nom, ou <c>null</c> si non trouvée.</param>
+        /// <param name="ignoreCase">Si <c>true</c>, la comparaison ignore la casse (par défaut : <c>true</c>).</param>
+        /// <returns><c>true</c> si une bibliothèque correspondant au nom a été trouvée ; sinon <c>false</c>.</returns>
+        /// <remarks>
+        /// Cette méthode délègue la recherche à <see cref="GetLibraryByName(string,bool)"/> qui effectue la recherche
+        /// en mémoire sur la collection retournée par <see cref="GetLibraries"/>. La méthode est sûre vis-à-vis des
+        /// entrées nulles ou vides : elle renverra <c>false</c> et affectera <paramref name="projet"/> à <c>null</c>.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// if (ProjetPDM.TryGetLibrary("MaBibliotheque", out var biblio))
+        /// {
+        ///     Console.WriteLine($"Bibliothèque trouvée : {biblio.Nom}");
+        /// }
+        /// else
+        /// {
+        ///     Console.WriteLine("Bibliothèque introuvable.");
+        /// }
+        /// </code>
+        /// </example>
+        public static bool TryGetLibrary(string name, out ProjetPDM projet, bool ignoreCase = true)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                projet = null;
+                return false;
+            }
+
+            projet = GetLibraryByName(name, ignoreCase);
+           
+            return projet != null;
+        }
     }
 }
