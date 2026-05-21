@@ -1,0 +1,31 @@
+<!--
+  Ce fichier est automatiquement importé par MSBuild pour tous les projets du répertoire.
+  Il déclenche la génération de la documentation DocFX après chaque build réussi d'OutilsTs,
+  sans jamais bloquer ni faire échouer le build principal.
+-->
+<Project>
+
+  <Target Name="GenerateDocFX"
+		  AfterTargets="Build"
+		  Condition="'$(AssemblyName)' == 'OutilsTs' AND '$(GenerateDocFXEnabled)' != 'false'">
+
+	<PropertyGroup>
+	  <!-- Chemin vers generate-docs.ps1 dans le dépôt iFixInvalidity voisin -->
+	  <DocFXScript>$(MSBuildThisFileDirectory)..\iFixInvalidity\generate-docs.ps1</DocFXScript>
+	  <PwshExe Condition="Exists('$(ProgramFiles)\PowerShell\7\pwsh.exe')">$(ProgramFiles)\PowerShell\7\pwsh.exe</PwshExe>
+	  <PwshExe Condition="'$(PwshExe)' == '' AND Exists('$(ProgramW6432)\PowerShell\7\pwsh.exe')">$(ProgramW6432)\PowerShell\7\pwsh.exe</PwshExe>
+	  <PwshExe Condition="'$(PwshExe)' == ''">powershell</PwshExe>
+	</PropertyGroup>
+
+	<Message Text="[DocFX] Déclenchement de la génération de documentation OutilsTs (Configuration=$(Configuration), Platform=$(Platform))..." Importance="normal" />
+
+	<Exec
+	  Command="&quot;$(PwshExe)&quot; -NoProfile -ExecutionPolicy Bypass -Command &quot;Start-Process -FilePath '$(PwshExe)' -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','$(DocFXScript)','-Project','OutilsTs','-Configuration','$(Configuration)','-Platform','$(Platform)' -WindowStyle Hidden&quot;"
+	  ContinueOnError="true"
+	  IgnoreExitCode="true" />
+
+	<Message Text="[DocFX] Documentation OutilsTs lancée en arrière-plan. Résultat disponible dans _site_outilsts/." Importance="normal" />
+
+  </Target>
+
+</Project>

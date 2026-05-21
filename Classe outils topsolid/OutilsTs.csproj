@@ -20,6 +20,8 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <OutputType>Library</OutputType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <!-- Force le nom du fichier XML de documentation pour éviter un nom vide (.xml) -->
+      <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
