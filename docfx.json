@@ -1,0 +1,31 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": ["**/*.csproj"],
+          "cwd": "Classe outils topsolid"
+        }
+      ],
+      "dest": "api",
+      "properties": {
+        "TargetFramework": "net481"
+      }
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": ["api/**.yml", "api/index.md"]
+      },
+      {
+        "files": ["**/*.md"],
+        "cwd": "Classe outils topsolid"
+      }
+    ],
+    "dest": "_site_outilsts",
+    "globalMetadata": {
+      "_appTitle": "OutilsTs Documentation"
+    }
+  }
+}
