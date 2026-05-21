@@ -33,6 +33,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Optimize>True</Optimize>
   </PropertyGroup>
+	
+	<PropertyGroup>
+      <CharSet>Unicode</CharSet>
+    </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="6.2.0" PrivateAssets="all" />

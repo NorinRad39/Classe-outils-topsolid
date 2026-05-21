@@ -88,6 +88,7 @@ namespace OutilsTs
         /// <summary>
         /// Détecte si l'application courante est une application WPF.
         /// </summary>
+        /// <returns><c>true</c> si l'application est WPF, sinon <c>false</c>.</returns>
         /// <remarks>
         /// Namespace: OutilsTs<br/>
         /// Assembly: OutilsTs (in OutilsTs.dll)
@@ -97,10 +98,6 @@ namespace OutilsTs
         /// bool isWpf = UiHelper.IsWpfProject();
         /// </code>
         /// </example>
-        /// <returns>
-        /// Type: <see cref="bool"/>
-        /// <c>true</c> si l'application est WPF, sinon <c>false</c>.
-        /// </returns>
         private static bool IsWpfProject()
         {
             try

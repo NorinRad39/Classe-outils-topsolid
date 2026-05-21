@@ -499,15 +499,6 @@ namespace OutilsTs
         /// <summary>
         /// Recherche une bibliothèque PDM par son nom.
         /// </summary>
-        /// <param name="name">Nom exact de la bibliothèque recherchée.</param>
-        /// <param name="ignoreCase">Si <c>true</c>, la recherche ignore la casse (par défaut <c>true</c>).</param>
-        /// <returns>L'instance <see cref="ProjetPDM"/> correspondante si trouvée, sinon <c>null</c>.</returns>
-        /// <remarks>
-        /// Effectue une recherche en mémoire sur la liste retournée par <see cref="GetLibraries"/>.
-        /// </remarks>
-               /// <summary>
-        /// Recherche une bibliothèque PDM par son nom.
-        /// </summary>
         /// <param name="name">Nom exact de la bibliothèque recherchée. La valeur <c>null</c> ou chaîne vide retourne <c>null</c>.</param>
         /// <param name="ignoreCase">Si <c>true</c>, la comparaison ignore la casse (par défaut : <c>true</c>).</param>
         /// <returns>
