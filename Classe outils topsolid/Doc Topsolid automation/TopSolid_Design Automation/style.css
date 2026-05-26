@@ -1,0 +1,464 @@
+.calibre {
+    color: #000;
+    display: block;
+    font-family: "Segoe UI", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    font-size: 1em;
+    margin-bottom: 0;
+    margin-left: 5pt;
+    margin-right: 5pt;
+    margin-top: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0
+    }
+.calibre1 {
+    display: table-row-group;
+    vertical-align: middle
+    }
+.calibre2 {
+    display: table-row;
+    vertical-align: inherit
+    }
+.calibre3 {
+    color: #000;
+    display: block;
+    font-family: "Segoe UI", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    font-size: 2em;
+    font-weight: normal;
+    line-height: 1.2;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    page-break-before: always
+    }
+.calibre4 {
+    background-color: #ededed;
+    border-bottom-color: #dbdbdb;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    color: #636363;
+    display: table-cell;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    padding-bottom: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 5px;
+    text-align: left;
+    vertical-align: inherit
+    }
+.calibre5 {
+    border-bottom-color: #dbdbdb;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    color: #2a2a2a;
+    display: table-cell;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    min-width: 72px;
+    padding-bottom: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 10px;
+    text-align: inherit;
+    vertical-align: top
+    }
+.calibre6 {
+    color: #1364c4;
+    text-decoration: none
+    }
+.calibre7 {
+    display: block;
+    line-height: 18px;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    padding-bottom: 15px
+    }
+.calibre8 {
+    border-bottom-color: currentColor;
+    border-bottom-style: none;
+    border-bottom-width: 0;
+    border-left-color: currentColor;
+    border-left-style: none;
+    border-left-width: 0;
+    border-right-color: currentColor;
+    border-right-style: none;
+    border-right-width: 0;
+    border-top-color: currentColor;
+    border-top-style: none;
+    border-top-width: 0;
+    height: auto;
+    padding-right: 5px;
+    width: auto
+    }
+.calibre9 {
+    color: #000;
+    font-weight: bold;
+    position: relative;
+    text-decoration: none;
+    top: 2px
+    }
+.calibre10 {
+    -ms-word-wrap: normal;
+    display: block;
+    font-family: Consolas, Courier, monospace;
+    font-style: normal;
+    font-weight: normal;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    overflow: auto;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    white-space: pre-wrap
+    }
+.calibre11 {
+    line-height: 1.2
+    }
+.calibre12 {
+    display: block;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em
+    }
+.calibre13 {
+    display: block;
+    font-weight: 600
+    }
+.calibre14 {
+    display: block;
+    margin-left: 40px
+    }
+.calibre15 {
+    display: block;
+    page-break-after: always
+    }
+.code {
+    background-color: #f4f4f4;
+    color: #006;
+    font-family: Consolas, Courier, monospace
+    }
+.codesnippetcontainer {
+    display: block;
+    margin-top: 10px;
+    min-width: 260px
+    }
+.codesnippetcontainercode {
+    display: block;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    width: auto
+    }
+.codesnippetcontainercode1 {
+    display: none;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    width: auto
+    }
+.codesnippetcontainercodecontainer {
+    border-bottom-color: #939393;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-left-color: #939393;
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-right-color: #939393;
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-top-color: #939393;
+    border-top-style: solid;
+    border-top-width: 1px;
+    display: block;
+    margin-bottom: 12px;
+    position: relative;
+    top: -1px
+    }
+.codesnippetcontainertab {
+    color: #2a2a2a;
+    display: block;
+    float: left;
+    font-family: "Segoe UI", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    font-size: 0.75em;
+    font-style: normal;
+    height: 22px;
+    padding-bottom: 0;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 0;
+    vertical-align: baseline;
+    width: auto
+    }
+.codesnippetcontainertabs {
+    display: block;
+    height: 23px;
+    position: relative;
+    top: 1px;
+    vertical-align: middle;
+    z-index: 1
+    }
+.codesnippettoolbar {
+    display: block;
+    height: auto;
+    width: auto
+    }
+.codesnippettoolbartext {
+    display: block;
+    float: right;
+    height: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    top: -13px;
+    vertical-align: top;
+    width: auto
+    }
+.collapsetoggle {
+    border-bottom-color: currentColor;
+    border-bottom-style: none;
+    border-bottom-width: 0;
+    border-left-color: currentColor;
+    border-left-style: none;
+    border-left-width: 0;
+    border-right-color: currentColor;
+    border-right-style: none;
+    border-right-width: 0;
+    border-top-color: currentColor;
+    border-top-style: none;
+    border-top-width: 0;
+    height: auto;
+    line-height: 1.2;
+    padding-right: 5px;
+    width: auto
+    }
+.collapsiblearearegion {
+    display: block;
+    margin-bottom: 15px;
+    margin-top: 15px
+    }
+.collapsibleregiontitle {
+    cursor: pointer;
+    font-family: "Segoe UI Semibold", "Segoe UI", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    font-size: 1.66667em;
+    font-style: normal;
+    line-height: 1.2;
+    margin-bottom: 19px;
+    margin-top: 9px;
+    padding-bottom: 5px;
+    padding-top: 20px
+    }
+.collapsiblesection {
+    display: block;
+    padding-bottom: 0;
+    padding-left: 20px;
+    padding-right: 0;
+    padding-top: 0
+    }
+.copycodesnippet {
+    background-color: #fff;
+    color: #1364c4;
+    font-family: "Segoe UI", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    font-size: 0.58333em;
+    font-style: normal;
+    margin-left: 0;
+    margin-right: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    text-decoration: none
+    }
+.highlight-comment {
+    color: #063
+    }
+.highlight-keyword {
+    color: #00F
+    }
+.highlight-literal {
+    color: #C00
+    }
+.iconcolumn {
+    background-color: #ededed;
+    border-bottom-color: #dbdbdb;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    color: #636363;
+    display: table-cell;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    padding-bottom: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 5px;
+    text-align: left;
+    vertical-align: inherit;
+    width: 100px
+    }
+.introstyle {
+    color: #a9a9a9
+    }
+.keyword {
+    color: #00f;
+    font-weight: normal
+    }
+.nolink {
+    font-weight: bold
+    }
+.pagebody {
+    display: block;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0 20px 0 0
+    }
+.pagefooter {
+    border-top-color: #bbb;
+    border-top-style: solid;
+    border-top-width: 1px;
+    clear: both;
+    display: block;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px
+    }
+.pageheader {
+    background-color: #333;
+    color: #d0d0d0;
+    display: block;
+    font-family: "Segoe UI", Tahoma, Helvetica, Sans-Serif;
+    height: 25px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    vertical-align: middle
+    }
+.parameter {
+    font-style: italic
+    }
+.parameter1 {
+    font-style: italic;
+    font-weight: normal
+    }
+.selflink {
+    color: #006
+    }
+.subheading {
+    color: #000;
+    display: block;
+    font-family: "Segoe UI Semibold", "Segoe UI", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    font-size: 1.125em;
+    font-weight: normal;
+    line-height: 1.2;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 5px
+    }
+.summary {
+    display: block
+    }
+.titlecolumn {
+    border-bottom-color: #dbdbdb;
+    border-bottom-style: solid;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    color: #2a2a2a;
+    display: table-cell;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 0;
+    padding-bottom: 10px;
+    padding-left: 0;
+    padding-right: 8px;
+    padding-top: 0;
+    text-align: inherit;
+    vertical-align: middle
+    }
+.titletable {
+    border-collapse: collapse;
+    border-spacing: 2px;
+    display: table;
+    font-size: 1em;
+    margin-bottom: 15px;
+    margin-top: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 20px;
+    padding-top: 0;
+    text-indent: 0;
+    width: 95%
+    }
+.topiccontent {
+    border-left-color: #bbb;
+    border-left-style: solid;
+    border-left-width: 1px;
+    display: block;
+    overflow: visible;
+    padding-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px
+    }
+.userdatastyle {
+    behavior: url(branding-help1.css#default#userdata)
+    }
+.pcalibre4:link {
+    color: #000;
+    text-decoration: none
+    }
+.pcalibre:link {
+    color: #1364c4;
+    text-decoration: none
+    }
+.pcalibre1:visited {
+    color: #03697a;
+    text-decoration: none
+    }
+.pcalibre3:hover {
+    color: #3390b1;
+    text-decoration: none
+    }
+.pcalibre5:hover {
+    color: #136460;
+    text-decoration: none
+    }
+.pcalibre2:active {
+    color: #03697a;
+    text-decoration: none
+    }
+
+@page {
+    margin-bottom: 5pt;
+    margin-top: 5pt
+    }
+

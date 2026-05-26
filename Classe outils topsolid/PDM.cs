@@ -10,38 +10,34 @@ using TSH = TopSolid.Kernel.Automating.TopSolidHost;
 namespace OutilsTs
 {
     /// <summary>
-    /// Classe utilitaire pour la gestion des opérations PDM (Product Data Management) dans TopSolid.
+    /// Classe utilitaire statique pour la gestion des opérations PDM (Product Data Management) dans TopSolid.
+    /// Couvre les projets, bibliothèques, dossiers et documents.
     /// </summary>
     /// <remarks>
-    /// Cette classe fournit des méthodes pour manipuler les projets, dossiers et documents du PDM TopSolid.
     /// Toutes les méthodes gèrent les erreurs en interne et retournent des valeurs par défaut en cas d'échec.
+    /// Les méthodes acceptant un <see cref="PdmObjectId"/> opèrent sur l'objet fourni.
+    /// Les surcharges sans paramètre opèrent sur le projet courant.
     /// </remarks>
     public static class PDM
     {
-        #region Récupération Projet
+        #region Projet courant
 
         /// <summary>
-        /// Récupère le PdmObjectId du projet courant.
-        /// Si un document est ouvert, utilise son projet parent.
-        /// Sinon, utilise le projet actif dans TopSolid.
+        /// Récupère le <see cref="PdmObjectId"/> du projet courant.
+        /// Si un document est ouvert, utilise son projet parent. Sinon, utilise le projet actif dans TopSolid.
         /// </summary>
-        /// <returns>Le PdmObjectId du projet courant, ou un PdmObjectId vide si aucun projet n'est trouvé.</returns>
+        /// <returns>Le <see cref="PdmObjectId"/> du projet courant, ou <see cref="PdmObjectId.Empty"/> si aucun projet n'est trouvé.</returns>
         /// <example>
         /// <code>
-        /// // Récupérer le projet courant
         /// PdmObjectId projet = PDM.GetCurrentProjectPdmObject();
         /// if (!projet.IsEmpty)
-        /// {
-        ///     string nomProjet = TSH.Pdm.GetName(projet);
-        ///     Console.WriteLine($"Projet actif : {nomProjet}");
-        /// }
+        ///     Console.WriteLine(PDM.GetName(projet));
         /// </code>
         /// </example>
         public static PdmObjectId GetCurrentProjectPdmObject()
         {
             var doc = TSH.Documents.EditedDocument;
 
-            // Si un document est ouvert, récupérer son projet parent
             if (doc != null && doc != DocumentId.Empty)
             {
                 try
@@ -49,80 +45,150 @@ namespace OutilsTs
                     var docPdmObjId = TSH.Documents.GetPdmObject(doc);
                     return TSH.Pdm.GetProject(docPdmObjId);
                 }
-                catch (Exception)
-                {
-                    // Si échec, tenter de récupérer le projet courant directement
-                }
+                catch (Exception) { }
             }
 
-            // Sinon, récupérer le projet actif dans TopSolid
             try
             {
                 return TSH.Pdm.GetCurrentProject();
             }
             catch (Exception)
             {
-                return new PdmObjectId(); // Retourne un PdmObjectId vide en cas d'échec
+                return new PdmObjectId();
             }
         }
 
         /// <summary>
         /// Récupère le nom du projet courant.
         /// </summary>
-        /// <returns>Le nom du projet, ou une chaîne vide si non trouvé.</returns>
-        /// <example>
-        /// <code>
-        /// // Afficher le nom du projet actif
-        /// string nomProjet = PDM.GetCurrentProjectName();
-        /// if (!string.IsNullOrEmpty(nomProjet))
-        /// {
-        ///     MessageBox.Show($"Vous travaillez sur : {nomProjet}");
-        /// }
-        /// </code>
-        /// </example>
+        /// <returns>Le nom du projet, ou <see cref="string.Empty"/> si non trouvé.</returns>
         public static string GetCurrentProjectName()
         {
             try
             {
                 var projectPdm = GetCurrentProjectPdmObject();
                 if (!projectPdm.IsEmpty)
-                {
                     return TSH.Pdm.GetName(projectPdm);
-                }
             }
-            catch (Exception)
-            {
-                // Silencieux en cas d'erreur
-            }
+            catch (Exception) { }
 
             return string.Empty;
         }
 
         #endregion
 
-        #region Gestion Documents
+        #region Bibliothèques
 
         /// <summary>
-        /// Récupère le PdmObjectId d'un document donné.
+        /// Récupère la liste des <see cref="PdmObjectId"/> de tous les projets bibliothèques PDM.
         /// </summary>
-        /// <param name="documentId">L'identifiant du document.</param>
-        /// <returns>Le PdmObjectId du document, ou un PdmObjectId vide si échec.</returns>
+        /// <returns>
+        /// Liste des <see cref="PdmObjectId"/> des bibliothèques, ou une liste vide si aucune n'est trouvée.
+        /// </returns>
         /// <example>
         /// <code>
-        /// // Récupérer le PdmObjectId du document actif
-        /// DocumentId docId = TSH.Documents.EditedDocument;
-        /// PdmObjectId pdmObj = PDM.GetDocumentPdmObject(docId);
-        /// if (!pdmObj.IsEmpty)
-        /// {
-        ///     Console.WriteLine("Document géré par PDM");
-        /// }
+        /// foreach (var lib in PDM.GetLibraries())
+        ///     Console.WriteLine(PDM.GetName(lib));
         /// </code>
         /// </example>
+        public static List<PdmObjectId> GetLibraries()
+        {
+            var result = new List<PdmObjectId>();
+            var allProjects = TSH.Pdm.GetProjects(false, true);
+            if (allProjects == null) return result;
+
+            foreach (var project in allProjects)
+                if (!project.IsEmpty)
+                    result.Add(project);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Récupère les noms de tous les projets bibliothèques PDM.
+        /// </summary>
+        /// <returns>Liste des noms. Les projets dont le nom est illisible sont ignorés.</returns>
+        /// <example>
+        /// <code>
+        /// foreach (var nom in PDM.GetLibraryNames())
+        ///     Console.WriteLine(nom);
+        /// </code>
+        /// </example>
+        public static List<string> GetLibraryNames()
+        {
+            var result = new List<string>();
+            foreach (var lib in GetLibraries())
+            {
+                try { result.Add(TSH.Pdm.GetName(lib)); }
+                catch { }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Recherche une bibliothèque PDM par son nom.
+        /// </summary>
+        /// <param name="name">Nom de la bibliothèque recherchée.</param>
+        /// <param name="ignoreCase">Si <c>true</c>, la comparaison ignore la casse (par défaut : <c>true</c>).</param>
+        /// <returns>
+        /// Le <see cref="PdmObjectId"/> de la bibliothèque si trouvée ; sinon <see cref="PdmObjectId.Empty"/>.
+        /// </returns>
+        /// <example>
+        /// <code>
+        /// PdmObjectId lib = PDM.GetLibraryByName("docuType");
+        /// if (!lib.IsEmpty)
+        ///     Console.WriteLine("Bibliothèque trouvée !");
+        /// </code>
+        /// </example>
+        public static PdmObjectId GetLibraryByName(string name, bool ignoreCase = true)
+        {
+            if (string.IsNullOrEmpty(name)) return PdmObjectId.Empty;
+
+            var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            foreach (var lib in GetLibraries())
+            {
+                try
+                {
+                    if (string.Equals(TSH.Pdm.GetName(lib), name, comparison))
+                        return lib;
+                }
+                catch { }
+            }
+            return PdmObjectId.Empty;
+        }
+
+        /// <summary>
+        /// Tente de récupérer une bibliothèque PDM par son nom.
+        /// </summary>
+        /// <param name="name">Nom recherché.</param>
+        /// <param name="libraryId">Sortie : le <see cref="PdmObjectId"/> de la bibliothèque, ou <see cref="PdmObjectId.Empty"/> si non trouvée.</param>
+        /// <param name="ignoreCase">Si <c>true</c>, la comparaison ignore la casse (par défaut : <c>true</c>).</param>
+        /// <returns><c>true</c> si la bibliothèque a été trouvée ; sinon <c>false</c>.</returns>
+        /// <example>
+        /// <code>
+        /// if (PDM.TryGetLibrary("docuType", out var libId))
+        ///     Console.WriteLine(PDM.GetName(libId));
+        /// </code>
+        /// </example>
+        public static bool TryGetLibrary(string name, out PdmObjectId libraryId, bool ignoreCase = true)
+        {
+            libraryId = GetLibraryByName(name, ignoreCase);
+            return !libraryId.IsEmpty;
+        }
+
+        #endregion
+
+        #region Documents
+
+        /// <summary>
+        /// Récupère le <see cref="PdmObjectId"/> d'un document donné.
+        /// </summary>
+        /// <param name="documentId">L'identifiant du document.</param>
+        /// <returns>Le <see cref="PdmObjectId"/> du document, ou <see cref="PdmObjectId.Empty"/> si échec.</returns>
         public static PdmObjectId GetDocumentPdmObject(DocumentId documentId)
         {
             if (documentId == null || documentId == DocumentId.Empty)
                 return new PdmObjectId();
-
             try
             {
                 return TSH.Documents.GetPdmObject(documentId);
@@ -137,79 +203,50 @@ namespace OutilsTs
         /// Vérifie si un document est géré par le PDM.
         /// </summary>
         /// <param name="documentId">L'identifiant du document.</param>
-        /// <returns>True si le document est géré par PDM, sinon False.</returns>
-        /// <example>
-        /// <code>
-        /// // Vérifier si le document actif est dans le PDM
-        /// DocumentId docId = TSH.Documents.EditedDocument;
-        /// if (PDM.IsDocumentInPdm(docId))
-        /// {
-        ///     MessageBox.Show("Ce document est sous contrôle PDM");
-        /// }
-        /// else
-        /// {
-        ///     MessageBox.Show("Document hors PDM");
-        /// }
-        /// </code>
-        /// </example>
+        /// <returns><c>true</c> si le document est sous contrôle PDM ; sinon <c>false</c>.</returns>
         public static bool IsDocumentInPdm(DocumentId documentId)
-        {
-            var pdmObject = GetDocumentPdmObject(documentId);
-            return !pdmObject.IsEmpty;
-        }
+            => !GetDocumentPdmObject(documentId).IsEmpty;
 
         /// <summary>
-        /// Récupère tous les documents du projet courant de manière récursive.
+        /// Récupère tous les documents d'un projet PDM de manière récursive.
         /// </summary>
-        /// <returns>Liste des PdmObjectId de tous les documents.</returns>
+        /// <param name="projectPdm">Le <see cref="PdmObjectId"/> du projet à explorer.</param>
+        /// <returns>Liste de tous les <see cref="PdmObjectId"/> de documents du projet.</returns>
         /// <example>
         /// <code>
-        /// // Lister tous les documents du projet
-        /// List&lt;PdmObjectId&gt; documents = PDM.GetAllProjectDocuments();
-        /// MessageBox.Show($"Nombre total de documents : {documents.Count}");
-        /// 
-        /// foreach (var doc in documents)
-        /// {
-        ///     string nomDoc = TSH.Pdm.GetName(doc);
-        ///     Console.WriteLine($"- {nomDoc}");
-        /// }
+        /// PdmObjectId lib = PDM.GetLibraryByName("docuType");
+        /// var docs = PDM.GetAllProjectDocuments(lib);
+        /// foreach (var doc in docs)
+        ///     Console.WriteLine(PDM.GetName(doc));
         /// </code>
         /// </example>
-        public static List<PdmObjectId> GetAllProjectDocuments()
+        public static List<PdmObjectId> GetAllProjectDocuments(PdmObjectId projectPdm)
         {
             var allDocuments = new List<PdmObjectId>();
-
             try
             {
-                var projectPdm = GetCurrentProjectPdmObject();
                 if (!projectPdm.IsEmpty)
                 {
-                    // Documents à la racine du projet
                     TSH.Pdm.GetConstituents(projectPdm, out var dossiers, out var documents);
-                    
-                    if (documents != null && documents.Count > 0)
-                    {
-                        allDocuments.AddRange(documents);
-                    }
-                    
-                    // Documents dans tous les dossiers
+                    if (documents != null) allDocuments.AddRange(documents);
                     if (dossiers != null)
-                    {
                         foreach (var dossier in dossiers)
-                        {
-                            var docsInFolder = GetDocumentsRecursive(dossier);
-                            allDocuments.AddRange(docsInFolder);
-                        }
-                    }
+                            allDocuments.AddRange(GetDocumentsRecursive(dossier));
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"ERREUR : {ex.Message}\n\nStack:\n{ex.StackTrace}", "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
             return allDocuments;
         }
+
+        /// <summary>
+        /// Récupère tous les documents du projet courant de manière récursive.
+        /// </summary>
+        /// <returns>Liste de tous les <see cref="PdmObjectId"/> de documents du projet courant.</returns>
+        public static List<PdmObjectId> GetAllProjectDocuments()
+            => GetAllProjectDocuments(GetCurrentProjectPdmObject());
 
         /// <summary>
         /// Récupère récursivement tous les documents d'un dossier et ses sous-dossiers.
@@ -219,75 +256,51 @@ namespace OutilsTs
         private static List<PdmObjectId> GetDocumentsRecursive(PdmObjectId folderPdm)
         {
             var allDocuments = new List<PdmObjectId>();
-
             try
             {
                 TSH.Pdm.GetConstituents(folderPdm, out var subFolders, out var documents);
-                
-                // Ajouter les documents du dossier courant
-                if (documents != null && documents.Count > 0)
-                {
-                    allDocuments.AddRange(documents);
-                }
-                
-                // Récursion dans les sous-dossiers
-                if (subFolders != null && subFolders.Count > 0)
-                {
+                if (documents != null) allDocuments.AddRange(documents);
+                if (subFolders != null)
                     foreach (var subFolder in subFolders)
-                    {
-                        var deeperDocuments = GetDocumentsRecursive(subFolder);
-                        allDocuments.AddRange(deeperDocuments);
-                    }
-                }
+                        allDocuments.AddRange(GetDocumentsRecursive(subFolder));
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"ERREUR dans GetDocumentsRecursive : {ex.Message}", "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
             return allDocuments;
         }
 
         #endregion
 
-        #region Gestion Dossiers (à implémenter)
+        #region Dossiers
 
         /// <summary>
-        /// Récupère la liste des dossiers du projet courant de manière récursive.
+        /// Récupère la liste de tous les dossiers d'un projet PDM de manière récursive.
         /// </summary>
-        /// <returns>Liste des PdmObjectId des dossiers.</returns>
+        /// <param name="projectPdm">Le <see cref="PdmObjectId"/> du projet à explorer.</param>
+        /// <returns>Liste des <see cref="PdmObjectId"/> de tous les dossiers du projet.</returns>
         /// <example>
         /// <code>
-        /// // Lister tous les dossiers du projet
-        /// List&lt;PdmObjectId&gt; dossiers = PDM.GetProjectFolders();
-        /// foreach (var dossier in dossiers)
-        /// {
-        ///     string nomDossier = TSH.Pdm.GetName(dossier);
-        ///     Console.WriteLine($"Dossier : {nomDossier}");
-        /// }
+        /// PdmObjectId lib = PDM.GetLibraryByName("docuType");
+        /// var dossiers = PDM.GetProjectFolders(lib);
+        /// foreach (var d in dossiers)
+        ///     Console.WriteLine(PDM.GetName(d));
         /// </code>
         /// </example>
-        public static List<PdmObjectId> GetProjectFolders()
+        public static List<PdmObjectId> GetProjectFolders(PdmObjectId projectPdm)
         {
             var folders = new List<PdmObjectId>();
-
             try
             {
-                var projectPdm = GetCurrentProjectPdmObject();
                 if (!projectPdm.IsEmpty)
                 {
-                    TSH.Pdm.GetConstituents(projectPdm, out var dossiers, out var documents);
-                    
+                    TSH.Pdm.GetConstituents(projectPdm, out var dossiers, out _);
                     if (dossiers != null)
                     {
                         folders.AddRange(dossiers);
-                        
-                        // Récupération récursive des sous-dossiers
                         foreach (var dossier in dossiers)
-                        {
-                            var subFolders = GetSubFoldersRecursive(dossier);
-                            folders.AddRange(subFolders);
-                        }
+                            folders.AddRange(GetSubFoldersRecursive(dossier));
                     }
                 }
             }
@@ -295,9 +308,15 @@ namespace OutilsTs
             {
                 MessageBox.Show($"ERREUR : {ex.Message}\n\nStack:\n{ex.StackTrace}", "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
             return folders;
         }
+
+        /// <summary>
+        /// Récupère la liste de tous les dossiers du projet courant de manière récursive.
+        /// </summary>
+        /// <returns>Liste des <see cref="PdmObjectId"/> de tous les dossiers du projet courant.</returns>
+        public static List<PdmObjectId> GetProjectFolders()
+            => GetProjectFolders(GetCurrentProjectPdmObject());
 
         /// <summary>
         /// Récupère récursivement tous les sous-dossiers d'un dossier donné.
@@ -307,69 +326,43 @@ namespace OutilsTs
         private static List<PdmObjectId> GetSubFoldersRecursive(PdmObjectId folderPdm)
         {
             var allSubFolders = new List<PdmObjectId>();
-
             try
             {
-                TSH.Pdm.GetConstituents(folderPdm, out var subFolders, out var files);
-                
-                if (subFolders != null && subFolders.Count > 0)
+                TSH.Pdm.GetConstituents(folderPdm, out var subFolders, out _);
+                if (subFolders != null)
                 {
                     allSubFolders.AddRange(subFolders);
-                    
-                    // Appel récursif pour chaque sous-dossier
                     foreach (var subFolder in subFolders)
-                    {
-                        var deeperFolders = GetSubFoldersRecursive(subFolder);
-                        allSubFolders.AddRange(deeperFolders);
-                    }
+                        allSubFolders.AddRange(GetSubFoldersRecursive(subFolder));
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"ERREUR dans GetSubFoldersRecursive : {ex.Message}", "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
             return allSubFolders;
         }
 
         /// <summary>
         /// Récupère la liste des fichiers dans un dossier PDM donné (non récursif).
         /// </summary>
-        /// <param name="folderPdmObject">Le PdmObjectId du dossier.</param>
-        /// <returns>Liste des PdmObjectId des fichiers du dossier uniquement.</returns>
-        /// <example>
-        /// <code>
-        /// // Récupérer les fichiers d'un dossier spécifique
-        /// List&lt;PdmObjectId&gt; dossiers = PDM.GetProjectFolders();
-        /// if (dossiers.Count > 0)
-        /// {
-        ///     PdmObjectId premierDossier = dossiers[0];
-        ///     List&lt;PdmObjectId&gt; fichiers = PDM.GetFilesInFolder(premierDossier);
-        ///     MessageBox.Show($"Nombre de fichiers : {fichiers.Count}");
-        /// }
-        /// </code>
-        /// </example>
+        /// <param name="folderPdmObject">Le <see cref="PdmObjectId"/> du dossier.</param>
+        /// <returns>Liste des <see cref="PdmObjectId"/> des fichiers du dossier uniquement.</returns>
         public static List<PdmObjectId> GetFilesInFolder(PdmObjectId folderPdmObject)
         {
             var files = new List<PdmObjectId>();
-
             try
             {
                 if (!folderPdmObject.IsEmpty)
                 {
-                    TSH.Pdm.GetConstituents(folderPdmObject, out var subFolders, out var documents);
-                    
-                    if (documents != null && documents.Count > 0)
-                    {
-                        files.AddRange(documents);
-                    }
+                    TSH.Pdm.GetConstituents(folderPdmObject, out _, out var documents);
+                    if (documents != null) files.AddRange(documents);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"ERREUR : {ex.Message}\n\nStack:\n{ex.StackTrace}", "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
             return files;
         }
 
@@ -378,16 +371,47 @@ namespace OutilsTs
         #region Utilitaires
 
         /// <summary>
+        /// Vérifie si un objet PDM est dans la corbeille (marqué pour suppression ou supprimé).
+        /// </summary>
+        /// <param name="pdmObjectId">L'identifiant de l'objet PDM à vérifier.</param>
+        /// <returns>
+        /// <c>true</c> si l'objet est dans l'état <see cref="PdmObjectState.ToDelete"/>,
+        /// <see cref="PdmObjectState.Deleted"/> ou <see cref="PdmObjectState.LockedBecauseToDelete"/> ;
+        /// sinon <c>false</c>.
+        /// </returns>
+        /// <example>
+        /// <code>
+        /// PdmObjectId pdmMaster = PDM.GetDocumentPdmObject(docMaster);
+        /// if (PDM.IsInRecycleBin(pdmMaster))
+        ///     Console.WriteLine("Le document est dans la corbeille.");
+        /// </code>
+        /// </example>
+        public static bool IsInRecycleBin(PdmObjectId pdmObjectId)
+        {
+            if (pdmObjectId.IsEmpty)
+                return false;
+
+            try
+            {
+                PdmObjectState state = TSH.Pdm.GetState(pdmObjectId);
+                return state == PdmObjectState.ToDelete
+                    || state == PdmObjectState.Deleted
+                    || state == PdmObjectState.LockedBecauseToDelete;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Récupère le nom d'un objet PDM.
         /// </summary>
         /// <param name="pdmObject">L'objet PDM.</param>
-        /// <returns>Le nom de l'objet, ou une chaîne vide si échec.</returns>
+        /// <returns>Le nom de l'objet, ou <see cref="string.Empty"/> si échec.</returns>
         /// <example>
         /// <code>
-        /// // Récupérer le nom d'un objet PDM
-        /// PdmObjectId projet = PDM.GetCurrentProjectPdmObject();
-        /// string nom = PDM.GetName(projet);
-        /// Console.WriteLine($"Nom : {nom}");
+        /// string nom = PDM.GetName(PDM.GetCurrentProjectPdmObject());
         /// </code>
         /// </example>
         public static string GetName(PdmObjectId pdmObject)
@@ -395,20 +419,15 @@ namespace OutilsTs
             try
             {
                 if (!pdmObject.IsEmpty)
-                {
                     return TSH.Pdm.GetName(pdmObject);
-                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"ERREUR : {ex.Message}\n\nStack:\n{ex.StackTrace}", "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
             return string.Empty;
         }
 
         #endregion
     }
-
-    
 }
