@@ -176,6 +176,42 @@ namespace OutilsTs
             return !libraryId.IsEmpty;
         }
 
+        /// <summary>
+        /// Ajoute des références à une ou plusieurs bibliothèques PDM pour le projet spécifié.
+        /// </summary>
+        /// <param name="ProjectId">Le <see cref="PdmObjectId"/> du projet cible. Si <see cref="PdmObjectId.IsEmpty"/> la méthode retourne immédiatement.</param>
+        /// <param name="lib">Le <see cref="PdmObjectId"/> de la bibliothèque à référencer.</param>
+        /// <param name="libs       
+        /// Liste des <see cref="PdmObjectId"/> représentant les projets bibliothèques à référencer.
+        /// Doit être non nulle ; si la liste est vide, aucun traitement n'est effectué.
+        /// </param>
+        /// <remarks>
+        /// - La méthode capture et gère les exceptions en affichant une boîte de dialogue d'erreur (aucune exception n'est propagée).
+        /// - Si <paramref name="ProjectId"/> est vide ou si <paramref name="lib"/> est vide, la méthode ne fait rien.
+        /// - Cette méthode s'appuie sur l'API TopSolid via <c>TSH.Pdm.AddReferencedProjects</c>.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// var projet = PDM.GetCurrentProjectPdmObject();
+        /// var lib = PDM.GetLibraryByName("docuType");
+        /// PDM.RefLibrary(projet, lib);
+        /// </code>
+        /// </example>
+        public static void RefLibrary(PdmObjectId ProjectId, PdmObjectId lib)
+        {
+            if (ProjectId.IsEmpty) return;
+            if (lib.IsEmpty) return;
+            List<PdmObjectId> libs = new List<PdmObjectId> { lib };
+            try
+            {
+                TSH.Pdm.AddReferencedProjects(ProjectId, libs);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"ERREUR lors du référencement de la bibliothèque dans le projet courant : {ex.Message}", "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         #endregion
 
         #region Documents
