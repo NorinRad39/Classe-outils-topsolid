@@ -407,6 +407,66 @@ namespace OutilsTs
         #region Utilitaires
 
         /// <summary>
+        /// Vérifie si un objet PDM est dans l'état coffré (<see cref="PdmObjectState.CheckedIn"/>).
+        /// </summary>
+        /// <param name="pdmObjectId">L'identifiant de l'objet PDM à vérifier.</param>
+        /// <returns>
+        /// <c>true</c> si l'objet est dans l'état <see cref="PdmObjectState.CheckedIn"/> ;
+        /// sinon <c>false</c>.
+        /// </returns>
+        /// <example>
+        /// <code>
+        /// PdmObjectId pdmDoc = PDM.GetDocumentPdmObject(docId);
+        /// if (!PDM.IsCheckedIn(pdmDoc))
+        ///     // effectuer le coffrage
+        /// </code>
+        /// </example>
+        public static bool IsCheckedIn(PdmObjectId pdmObjectId)
+        {
+            if (pdmObjectId.IsEmpty)
+                return false;
+
+            try
+            {
+                return TSH.Pdm.GetState(pdmObjectId) == PdmObjectState.CheckedIn;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Vérifie si un objet PDM est dans l'état validé (<see cref="PdmObjectState.Validated"/>).
+        /// </summary>
+        /// <param name="pdmObjectId">L'identifiant de l'objet PDM à vérifier.</param>
+        /// <returns>
+        /// <c>true</c> si l'objet est dans l'état <see cref="PdmObjectState.Validated"/> ;
+        /// sinon <c>false</c>.
+        /// </returns>
+        /// <example>
+        /// <code>
+        /// PdmObjectId pdmDoc = PDM.GetDocumentPdmObject(docId);
+        /// if (!PDM.IsValidated(pdmDoc))
+        ///     // effectuer la validation
+        /// </code>
+        /// </example>
+        public static bool IsValidated(PdmObjectId pdmObjectId)
+        {
+            if (pdmObjectId.IsEmpty)
+                return false;
+
+            try
+            {
+                return TSH.Pdm.GetState(pdmObjectId) == PdmObjectState.Validated;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Vérifie si un objet PDM est dans la corbeille (marqué pour suppression ou supprimé).
         /// </summary>
         /// <param name="pdmObjectId">L'identifiant de l'objet PDM à vérifier.</param>
