@@ -25,7 +25,18 @@ Constructeurs :
     // Syntaxe :
     // var doc = new Document(monDocId);
 
+Propriétés statiques :
+- Document Empty
+    // Instance vide de Document (document non initialisé).
+    // Syntaxe :
+    // if (doc.IsEmpty) { ... }
+
 Propriétés principales :
+- bool IsEmpty
+    // Indique si le document est vide.
+    // Syntaxe :
+    // if (doc.IsEmpty) { ... }
+
 - string DocNomTxt
     // Nom du document.
     // Syntaxe :
@@ -51,10 +62,15 @@ Propriétés principales :
     // Syntaxe :
     // var operations = doc.DocOperations;
 
-- List<ElementId> DocElements          // ✅ AJOUTER ICI
+- List<ElementId> DocElements
     // Liste de tous les éléments du document.
     // Syntaxe :
     // var elements = doc.DocElements;
+
+- List<ElementId> Publishing
+    // Liste des publications du document.
+    // Syntaxe :
+    // var publishings = doc.Publishing;
 
 - ElementId DocCommentaireSysId
     // Identifiant du paramètre commentaire système.
@@ -112,11 +128,13 @@ namespace OutilsTs
         private List<ElementId> docParameters = new List<ElementId>();
         private List<ElementId> docOperations = new List<ElementId>();
         private List<ElementId> docElements = new List<ElementId>();  
+        private List<ElementId> docPublishings = new List<ElementId>();
         private ElementId docCommentaireSysId;
         private ElementId docDescriptionSysId;
         private bool docDerived;
         private bool docIsElectrode;
         private static Dictionary<DocumentId, string> _cacheNomDocuments = new Dictionary<DocumentId, string>();
+        private static readonly Document _empty = new Document(isEmpty: true);
         #endregion
 
         #region Constructeurs
@@ -177,15 +195,64 @@ namespace OutilsTs
             // - docExtention (extension/type)
             // - docParameters (liste des paramètres)
             // - docOperations (liste des opérations)
+            // - docElements (liste des éléments)
+            // - docPublishings (liste des publications)
             // - docCommentaireSysId (paramètre commentaire système)
             // - docDescriptionSysId (paramètre description système)
             // - docDerived (si le document est dérivé)
             // - docIsElectrode (si le document est une électrode)
             DocId = docId;
         }
+
+        /// <summary>
+        /// Constructeur privé réservé à la création de l'instance <see cref="Empty"/>.
+        /// N'exécute aucune validation ni initialisation API.
+        /// </summary>
+        private Document(bool isEmpty)
+        {
+            docId = DocumentId.Empty;
+        }
         #endregion
 
         #region Propriétés publiques
+        /// <summary>
+        /// Obtient une instance vide de <see cref="Document"/> (document non initialisé).
+        /// </summary>
+        /// <remarks>
+        /// Namespace: OutilsTs  
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// Document doc = Document.Empty;
+        /// if (doc.IsEmpty) { /* document non initialisé */ }
+        /// </code>
+        /// </example>
+        /// <returns>
+        /// Type: <see cref="Document"/>
+        /// Instance vide de Document.
+        /// </returns>
+        public static Document Empty => _empty;
+
+        /// <summary>
+        /// Indique si le document est vide (non initialisé).
+        /// </summary>
+        /// <remarks>
+        /// Namespace: OutilsTs  
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// var doc = new Document();
+        /// if (doc.IsEmpty) { /* document non initialisé */ }
+        /// </code>
+        /// </example>
+        /// <returns>
+        /// Type: <see cref="bool"/>
+        /// <c>true</c> si le document est vide, sinon <c>false</c>.
+        /// </returns>
+        public bool IsEmpty => docId == DocumentId.Empty;
+
         /// <summary>
         /// Obtient ou définit l'identifiant du document TopSolid.
         /// </summary>
@@ -283,6 +350,17 @@ namespace OutilsTs
                     // En cas d'erreur, on initialise avec une liste vide
                     Console.WriteLine($"Erreur lors de la récupération des éléments : {ex.Message}");
                     docElements = new List<ElementId>();
+                }
+
+                // --- Initialisation de la liste des publications ---
+                try
+                {
+                    docPublishings = TSH.Entities.GetPublishings(docId) ?? new List<ElementId>();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erreur lors de la récupération des publications : {ex.Message}");
+                    docPublishings = new List<ElementId>();
                 }
 
                 // --- Initialisation du paramètre commentaire système ---
@@ -505,6 +583,29 @@ namespace OutilsTs
         { 
             get => docElements; 
             private set => docElements = value; 
+        }
+
+        /// <summary>
+        /// Obtient la liste des publications du document.
+        /// </summary>
+        /// <remarks>
+        /// Namespace: OutilsTs  
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// var doc = new Document();
+        /// var publications = doc.Publishing;
+        /// </code>
+        /// </example>
+        /// <returns>
+        /// Type: <see cref="List{ElementId}"/>
+        /// Liste des publications du document.
+        /// </returns>
+        public List<ElementId> Publishing
+        {
+            get => docPublishings;
+            private set => docPublishings = value;
         }
 
         /// <summary>
@@ -1073,6 +1174,37 @@ namespace OutilsTs
             catch (Exception ex)
             {
                 HandleException(ex, "Impossible de récupérer les éléments du document.");
+                return new List<ElementId>();
+            }
+        }
+
+        /// <summary>
+        /// Récupère les publications du document.
+        /// </summary>
+        /// <param name="document">Identifiant du document.</param>
+        /// <remarks>
+        /// Namespace: OutilsTs  
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// var publications = GetPublishings(docId);
+        /// </code>
+        /// </example>
+        /// <returns>
+        /// Type: <see cref="List{ElementId}"/>
+        /// Liste des publications du document.
+        /// </returns>
+        private List<ElementId> GetPublishings(DocumentId document)
+        {
+            if (!IsValidDocument(document)) return new List<ElementId>();
+            try
+            {
+                return TSH.Entities.GetPublishings(document);
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex, "Impossible de récupérer les publications du document.");
                 return new List<ElementId>();
             }
         }
