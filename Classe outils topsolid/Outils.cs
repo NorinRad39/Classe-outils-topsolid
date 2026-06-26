@@ -37,6 +37,11 @@ Propriétés principales :
     // Syntaxe :
     // if (doc.IsEmpty) { ... }
 
+- bool IsDirty
+    // Indique si le document a des modifications non sauvegardées.
+    // Syntaxe :
+    // if (doc.IsDirty) { ... }
+
 - string DocNomTxt
     // Nom du document.
     // Syntaxe :
@@ -252,6 +257,40 @@ namespace OutilsTs
         /// <c>true</c> si le document est vide, sinon <c>false</c>.
         /// </returns>
         public bool IsEmpty => docId == DocumentId.Empty;
+
+        /// <summary>
+        /// Indique si le document a des modifications non sauvegardées.
+        /// </summary>
+        /// <remarks>
+        /// Namespace: OutilsTs  
+        /// Assembly: OutilsTs (in OutilsTs.dll)
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// var doc = new Document();
+        /// if (doc.IsDirty) { /* modifications non sauvegardées */ }
+        /// </code>
+        /// </example>
+        /// <returns>
+        /// Type: <see cref="bool"/>
+        /// <c>true</c> si le document a des modifications non sauvegardées, sinon <c>false</c>.
+        /// </returns>
+        public bool IsDirty
+        {
+            get
+            {
+                if (IsEmpty) return false;
+                try
+                {
+                    return TSH.Documents.IsDirty(docId);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erreur lors de la vérification de l'état dirty du document : {ex.Message}");
+                    return false;
+                }
+            }
+        }
 
         /// <summary>
         /// Obtient ou définit l'identifiant du document TopSolid.
