@@ -33,7 +33,7 @@ namespace OutilsTs
     /// Classe utilitaire pour gérer les exports TopSolid.
     /// Détecte automatiquement l'exporteur en fonction de l'extension du fichier.
     /// </summary>
-    public static class Export
+    public class Export
     {
         #region Méthodes publiques
 
