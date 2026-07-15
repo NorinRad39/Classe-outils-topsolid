@@ -80,8 +80,14 @@ namespace OutilsTs
             // 2. Nettoyer l'extension (enlever le point si présent)
             extension = extension.TrimStart('.').ToLower();
 
+
             // 3. Construire le chemin complet
             string cheminComplet = Path.Combine(cheminDossier, $"{nomFichier}.{extension}");
+
+            if (extension == "jbt")
+            {
+                extension = "pdf"; // Remplacer l'extension .jbt par .pdf pour l'export
+            }
 
             // 4. Trouver l'exporteur correspondant à l'extension
             if (!FindExporterIndexByExtension(extension, out int exporterIndex))
