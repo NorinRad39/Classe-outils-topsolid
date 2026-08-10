@@ -78,21 +78,21 @@ namespace OutilsTs
             }
 
             // 2. Nettoyer l'extension (enlever le point si présent)
-            extension = extension.TrimStart('.').ToLower();
+            string extensionDemandee = extension.TrimStart('.').ToLower();
 
 
-            // 3. Construire le chemin complet
-            string cheminComplet = Path.Combine(cheminDossier, $"{nomFichier}.{extension}");
+            // 3. Déterminer l'extension réelle d'export
+            string extensionExport = extensionDemandee == "jbt" ? "pdf" : extensionDemandee;
 
-            if (extension == "jbt")
-            {
-                extension = "pdf"; // Remplacer l'extension .jbt par .pdf pour l'export
-            }
+            // 4. Construire le chemin complet d'export
+            string cheminCompletExport = Path.Combine(cheminDossier, $"{nomFichier}.{extensionExport}");
+
+
 
             // 4. Trouver l'exporteur correspondant à l'extension
-            if (!FindExporterIndexByExtension(extension, out int exporterIndex))
+            if (!FindExporterIndexByExtension(extensionExport, out int exporterIndex))
             {
-                throw new InvalidOperationException($"Aucun exporteur trouvé pour l'extension '.{extension}'.");
+                throw new InvalidOperationException($"Aucun exporteur trouvé pour l'extension '.{extensionExport}'.");
             }
 
             // 5. Effectuer l'export (avec ou sans options)
@@ -100,12 +100,28 @@ namespace OutilsTs
             {
                 // Export avec options personnalisées
                 List<KeyValue> options = ApplyCustomOptions(exporterIndex, customOptions);
-                TSH.Documents.ExportWithOptions(exporterIndex, options, documentId, cheminComplet);
+                TSH.Documents.ExportWithOptions(exporterIndex, options, documentId, cheminCompletExport);
             }
             else
             {
                 // Export simple (sans options personnalisées)
-                TSH.Documents.Export(exporterIndex, documentId, cheminComplet);
+                TSH.Documents.Export(exporterIndex, documentId, cheminCompletExport);
+            }
+
+            // 6. Si on demande un .jbt, renommer le PDF exporté en .jbt
+            if (extensionDemandee == "jbt")
+            {
+                string cheminCompletJbt = Path.Combine(cheminDossier, $"{nomFichier}.jbt");
+
+                if (File.Exists(cheminCompletJbt))
+                {
+                    File.Delete(cheminCompletJbt);
+                }
+
+                if (File.Exists(cheminCompletExport))
+                {
+                    File.Move(cheminCompletExport, cheminCompletJbt);
+                }
             }
         }
 
