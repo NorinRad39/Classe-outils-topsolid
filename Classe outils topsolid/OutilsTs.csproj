@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net481</TargetFramework>
@@ -6,14 +6,14 @@
     <AssemblyName>OutilsTs</AssemblyName>
     <LangVersion>8.0</LangVersion>
     <PackageId>OutilsTs</PackageId>
-    <Version>1.0.10</Version> <!-- Incrémenter ici : 1.0.0 → 1.0.1 → 1.1.0 etc. -->
+    <Version>2.0.0</Version> <!-- Incrémenter ici : 1.0.0 → 1.0.1 → 1.1.0 etc. -->
     <Authors>NorinRad39</Authors>
     <Company>Votre Société</Company>
     <Description>Classe utilitaire pour TopSolid Automating - Export, connexion et outils</Description>
     <PackageProjectUrl>https://github.com/NorinRad39/Classe-outils-topsolid</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NorinRad39/Classe-outils-topsolid</RepositoryUrl>
     <PackageTags>topsolid;automating;export;cad</PackageTags>
-    <PackageReleaseNotes>Ajout de la classe Export avec support multi-formats</PackageReleaseNotes>
+    <PackageReleaseNotes>RUPTURE : la classe ProjetPDM est supprimee ; ses fonctionnalites sont reprises par PDM. Ajouts : bibliotheques PDM (GetLibraries, GetLibraryNames, GetLibraryByName, TryGetLibrary, RefLibrary), parcours de projet (GetAllProjectDocuments, GetProjectFolders), etat des documents (IsCheckedIn, IsValidated, IsInRecycleBin) et recuperation des publications. Correction : generation du chemin d'export lorsque le dossier Ind n'existe pas.</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Platforms>x64</Platforms>
