@@ -15,7 +15,7 @@ Méthodes publiques :
 - void ExportDocId(DocumentId documentId, string cheminDossier, string nomFichier, string extension, Dictionary<string, string> customOptions = null)
     // Exporte un document TopSolid au format déterminé par l'extension.
     // Syntaxe :
-    // Export.ExportDocId(docId, @"C:\Export", "piece", "x_t", new Dictionary<string, string> { {"SAVE_VERSION", "30"} });
+    // Export.ExportDocId(docId, @"C:\Export", "piece", "x_t", new Dictionary<string, string> { {"SAVE_VERSION", "310"} });
     // Export.ExportDocId(docId, @"C:\Export", "piece", "step");
 
 Méthodes privées :
@@ -44,15 +44,15 @@ namespace OutilsTs
         /// <param name="cheminDossier">Chemin du dossier de destination (ex: @"C:\Export").</param>
         /// <param name="nomFichier">Nom du fichier sans extension (ex: "piece").</param>
         /// <param name="extension">Extension du fichier (ex: "x_t", "step", "igs").</param>
-        /// <param name="customOptions">Dictionnaire d'options personnalisées (ex: {"SAVE_VERSION", "30"}). Si null, utilise les options par défaut.</param>
+        /// <param name="customOptions">Dictionnaire d'options personnalisées (ex: {"SAVE_VERSION", "310"}). Si null, utilise les options par défaut.</param>
         /// <remarks>
         /// Namespace: OutilsTs
         /// Assembly: OutilsTs (in OutilsTs.dll)
         /// </remarks>
         /// <example>
         /// <code>
-        /// // Export Parasolid X_T version 30
-        /// var options = new Dictionary&lt;string, string&gt; { {"SAVE_VERSION", "30"} };
+        /// // Export Parasolid X_T version 31 (la valeur vaut la version x 10)
+        /// var options = new Dictionary&lt;string, string&gt; { {"SAVE_VERSION", "310"} };
         /// Export.ExportDocId(docId, @"C:\Export", "piece", "x_t", options);
         /// 
         /// // Export STEP sans options
@@ -131,7 +131,7 @@ namespace OutilsTs
         /// <param name="cheminDossier">Chemin du dossier de destination (ex: @"C:\Export").</param>
         /// <param name="nomFichier">Nom du fichier sans extension (ex: "piece").</param>
         /// <param name="extension">Extension du fichier (ex: "x_t", "step", "igs").</param>
-        /// <param name="customOptions">Dictionnaire d'options personnalisées (ex: {"SAVE_VERSION", "30"}). Si null, utilise les options par défaut.</param>
+        /// <param name="customOptions">Dictionnaire d'options personnalisées (ex: {"SAVE_VERSION", "310"}). Si null, utilise les options par défaut.</param>
         /// <remarks>
         /// Namespace: OutilsTs
         /// Assembly: OutilsTs (in OutilsTs.dll)
@@ -204,10 +204,19 @@ namespace OutilsTs
                     }
                 }
 
-                // Avertissement si l'option n'existe pas pour cet exporteur
+                // Une cle inconnue ne doit pas passer inapercue : l'export se ferait avec la
+                // valeur par defaut, donc un resultat different de celui demande, sans que rien
+                // ne le signale. Les cles exposees changent d'une version de TopSolid a l'autre :
+                // on les liste pour que la correction soit immediate.
                 if (!optionFound)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Avertissement : L'option '{customOption.Key}' n'existe pas pour cet exporteur.");
+                    string clesDisponibles = (options == null || options.Count == 0)
+                        ? "(aucune)"
+                        : string.Join(", ", options.Select(o => o.Key));
+
+                    throw new InvalidOperationException(
+                        $"L'option '{customOption.Key}' n'existe pas pour cet exporteur. " +
+                        $"Options disponibles : {clesDisponibles}.");
                 }
             }
 
