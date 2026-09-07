@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Éléments de solution/">
+    <File Path="LICENSE" />
+  </Folder>
+  <Project Path="Classe outils topsolid/OutilsTs.csproj">
+    <Platform Project="x64" />
+  </Project>
+</Solution>
