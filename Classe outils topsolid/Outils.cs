@@ -215,6 +215,8 @@ namespace OutilsTs
         /// </summary>
         private Document(bool isEmpty)
         {
+            // Référence volontaire du paramètre pour éviter l'avertissement IDE0060 (paramètre non utilisé)
+            _ = isEmpty;
             docId = DocumentId.Empty;
         }
         #endregion
